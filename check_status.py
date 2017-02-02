@@ -1,9 +1,11 @@
 import os
+import sys
 import re
 import subprocess
 from urllib.request import urlopen
 import json
 import requests
+import hashlib
 
 # To be modified variables
 VERSION = 'v1.0.0'
@@ -21,27 +23,27 @@ COMMIT_PATH = '/commits'
 TAG_PATH = '/git/refs/tags/'
 HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
 
+SCRIPT_NAME = sys.argv[0]
+UPDATE_FILE = 'updated.py'
 
 def update():
     r = requests.get(API_URL + '/rate_limit')
 
-    if False:
-        # Get latest commit and check if OK
-        r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
-        commit = r.json()[0]
-        verified = commit.get('commit').get('verification').get('verified')
-        author = commit.get('author').get('login')
-        sha = commit.get('sha')
+    # Get latest commit and check if OK
+    r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
+    commit = r.json()[0]
+    verified = commit.get('commit').get('verification').get('verified')
+    author = commit.get('author').get('login')
+    sha = commit.get('sha')
 
-        download_needed = verified and author in ALLOWED_COMMITTERS
-    else:
-        download_needed = True
+    # download_needed = verified and author in ALLOWED_COMMITTERS
+    download_needed = author in ALLOWED_COMMITTERS
 
-    if False and download_needed:
+    if download_needed:
         r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
         files = r.json().get('files')
         for f in files:
-            if f.get('filename') == sys.argv[0]:
+            if f.get('filename') == SCRIPT_NAME:
                 url = f.get('raw_url')
 
     url = 'https://github.com/BdEINSALyon/dashboard_client/raw/2abb28c6095ad79d5f992617078fc2adece91e63/check_status.py'
@@ -50,8 +52,29 @@ def update():
 
     r = requests.get(url)
 
-    with open('updated.py', 'w') as f:
+    with open(UPDATE_FILE, 'w') as f:
         print(r.text, file=f)
+
+    with open(UPDATE_FILE, 'rb') as f1:
+        with open(SCRIPT_NAME, 'rb') as f2:
+            h1 = hashlib.sha256(f1.read()).hexdigest()
+            h2 = hashlib.sha256(f2.read()).hexdigest()
+
+    restart_needed = h1 != h2
+    print('restart_needed', restart_needed)
+
+    if restart_needed:
+        # Prepare args for script restart
+        args = sys.argv[:]
+        args.insert(0, sys.executable)
+        if sys.platform == 'win32':
+            args = ['"%s"' % arg for arg in args]
+
+        os.remove(SCRIPT_NAME)
+        os.rename(UPDATE_FILE, SCRIPT_NAME)
+        os.chdir(os.getcwd())
+        os.execv(sys.executable, args)
+
 
 def main():
     update()
