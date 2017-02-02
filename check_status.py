@@ -44,11 +44,14 @@ def update():
             if f.get('filename') == sys.argv[0]:
                 url = f.get('raw_url')
 
-    url = 'https://github.com/BdEINSALyon/dashboard_client/raw/34d3c1c8a8d063b9e3d4e0166eb83f54325de2fa/check_status.py'
+    url = 'https://github.com/BdEINSALyon/dashboard_client/raw/2abb28c6095ad79d5f992617078fc2adece91e63/check_status.py'
     print(download_needed)
     print(url)
 
+    r = requests.get(url)
 
+    with open('updated.py', 'w') as f:
+        print(r.text, file=f)
 
 def main():
     update()
