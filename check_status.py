@@ -90,13 +90,13 @@ def main():
     else:
         status['shutdown'] = 'sactiv' not in ret
 
-    # status['apps'] = {}
-    # apps = get_ret_str('wmic product get /format:csv')
-    # status['apps']['office'] = 'office' in apps
-    # status['apps']['photoshop'] = 'photoshop' in apps
-    # status['apps']['indesign'] = 'indesign' in apps
-    # status['apps']['premiere'] = 'premiere' in apps
-    # status['apps']['illustrator'] = 'illustrator' in apps
+    status['apps'] = {}
+    apps = get_ret_str('wmic product get /format:csv')
+    status['apps']['office'] = 'office' in apps
+    status['apps']['photoshop'] = 'photoshop' in apps
+    status['apps']['indesign'] = 'indesign' in apps
+    status['apps']['premiere'] = 'premiere' in apps
+    status['apps']['illustrator'] = 'illustrator' in apps
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers
@@ -119,8 +119,8 @@ def main():
 
     status['name'] = os.environ.get('COMPUTERNAME')
 
-    print(status)
-    # urlopen(UPDATE_URL, data=json.dumps(status).encode())
+    # print(status)
+    urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
 
 def get_ret(cmd, *args, **kwargs):
