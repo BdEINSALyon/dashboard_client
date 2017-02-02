@@ -3,27 +3,70 @@ import re
 import subprocess
 from urllib.request import urlopen
 import json
+import requests
 
+# To be modified variables
+VERSION = 'v1.0.0'
+ALLOWED_COMMITTERS = {'PhilippeGeek', 'Crocmagnon'}
+
+# Referring server
 SERVER = 'http://192.168.1.27:8000'
 UPDATE_URL = SERVER + '/update'
 
+# GitHub API settings
+API_URL = 'https://api.github.com'
+REPO_URL = API_URL + '/repos/bdeinsalyon/dashboard_client'
+LATEST_RELEASE = '/releases/latest'
+COMMIT_PATH = '/commits'
+TAG_PATH = '/git/refs/tags/'
+HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
+
+
+def update():
+    r = requests.get(API_URL + '/rate_limit')
+
+    if False:
+        # Get latest commit and check if OK
+        r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
+        commit = r.json()[0]
+        verified = commit.get('commit').get('verification').get('verified')
+        author = commit.get('author').get('login')
+        sha = commit.get('sha')
+
+        download_needed = verified and author in ALLOWED_COMMITTERS
+    else:
+        download_needed = True
+
+    if False and download_needed:
+        r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
+        files = r.json().get('files')
+        for f in files:
+            if f.get('filename') == sys.argv[0]:
+                url = f.get('raw_url')
+
+    url = 'https://github.com/BdEINSALyon/dashboard_client/raw/34d3c1c8a8d063b9e3d4e0166eb83f54325de2fa/check_status.py'
+    print(download_needed)
+    print(url)
+
+
 
 def main():
+    update()
     status = {}
     try:
-        get_ret('schtasks /query /tn "Shutdown"')
+        ret = get_ret_str('schtasks /query /tn "Shutdown"')
     except subprocess.CalledProcessError:
         status['shutdown'] = False
     else:
-        status['shutdown'] = True
+        status['shutdown'] = 'sactiv' not in ret
 
-    status['apps'] = {}
-    apps = get_ret_str('wmic product get /format:csv')
-    status['apps']['office'] = 'office' in apps
-    status['apps']['photoshop'] = 'photoshop' in apps
-    status['apps']['indesign'] = 'indesign' in apps
-    status['apps']['premiere'] = 'premiere' in apps
-    status['apps']['illustrator'] = 'illustrator' in apps
+    # status['apps'] = {}
+    # apps = get_ret_str('wmic product get /format:csv')
+    # status['apps']['office'] = 'office' in apps
+    # status['apps']['photoshop'] = 'photoshop' in apps
+    # status['apps']['indesign'] = 'indesign' in apps
+    # status['apps']['premiere'] = 'premiere' in apps
+    # status['apps']['illustrator'] = 'illustrator' in apps
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers
@@ -46,7 +89,8 @@ def main():
 
     status['name'] = os.environ.get('COMPUTERNAME')
 
-    urlopen(UPDATE_URL, data=json.dumps(status).encode())
+    print(status)
+    # urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
 
 def get_ret(cmd, *args, **kwargs):
