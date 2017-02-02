@@ -12,7 +12,7 @@ VERSION = 'v1.0.0'
 ALLOWED_COMMITTERS = {'PhilippeGeek', 'Crocmagnon'}
 
 # Referring server
-SERVER = 'http://192.168.1.27:8000'
+SERVER = 'http://status.bde-insa-lyon.fr'
 UPDATE_URL = SERVER + '/update'
 
 # GitHub API settings
@@ -50,7 +50,7 @@ def update():
 
     if url is None:
         return
-        
+
     r = requests.get(url)
 
     with open(UPDATE_FILE, 'w') as f:
