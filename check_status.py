@@ -36,8 +36,7 @@ def update():
     author = commit.get('author').get('login')
     sha = commit.get('sha')
 
-    # download_needed = verified and author in ALLOWED_COMMITTERS
-    download_needed = author in ALLOWED_COMMITTERS
+    download_needed = verified and author in ALLOWED_COMMITTERS
 
     if not download_needed:
         return
@@ -47,9 +46,6 @@ def update():
     for f in files:
         if f.get('filename') == SCRIPT_NAME:
             url = f.get('raw_url')
-
-    print(download_needed)
-    print(url)
 
     r = requests.get(url)
 
