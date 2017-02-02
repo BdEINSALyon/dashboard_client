@@ -43,10 +43,14 @@ def update():
 
     r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
     files = r.json().get('files')
+    url = None
     for f in files:
         if f.get('filename') == SCRIPT_NAME:
             url = f.get('raw_url')
 
+    if url is None:
+        return
+        
     r = requests.get(url)
 
     with open(UPDATE_FILE, 'w') as f:
