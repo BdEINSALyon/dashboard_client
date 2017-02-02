@@ -41,7 +41,7 @@ def update():
 
     if not download_needed:
         return
-        
+
     r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
     files = r.json().get('files')
     for f in files:
@@ -75,6 +75,9 @@ def update():
         os.rename(UPDATE_FILE, SCRIPT_NAME)
         os.chdir(os.getcwd())
         os.execv(sys.executable, args)
+
+    else:
+        os.remove(UPDATE_FILE)
 
 
 def main():
