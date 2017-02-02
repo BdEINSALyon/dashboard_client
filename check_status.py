@@ -39,14 +39,15 @@ def update():
     # download_needed = verified and author in ALLOWED_COMMITTERS
     download_needed = author in ALLOWED_COMMITTERS
 
-    if download_needed:
-        r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
-        files = r.json().get('files')
-        for f in files:
-            if f.get('filename') == SCRIPT_NAME:
-                url = f.get('raw_url')
+    if not download_needed:
+        return
+        
+    r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
+    files = r.json().get('files')
+    for f in files:
+        if f.get('filename') == SCRIPT_NAME:
+            url = f.get('raw_url')
 
-    url = 'https://github.com/BdEINSALyon/dashboard_client/raw/2abb28c6095ad79d5f992617078fc2adece91e63/check_status.py'
     print(download_needed)
     print(url)
 
