@@ -92,18 +92,50 @@ def main():
 
     status['apps'] = {}
 
-    status['apps']['office'] = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
+    office = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
+    status['apps']['office'] = {
+        'installed': office
+        'name': 'Microsoft Office'
+    }
 
-    status['apps']['vlc'] = 'ok' in get_ret_decode('if exist "c:\Program Files\VideoLAN" echo ok', shell=True)
+    vlc = 'ok' in get_ret_decode('if exist "c:\Program Files\VideoLAN" echo ok', shell=True)
+    status['apps']['vlc'] = {
+        'installed': vlc
+        'name': 'VLC'
+    }
 
-    status['apps']['photoshop'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
-    status['apps']['indesign'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
-    status['apps']['premiere'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
-    status['apps']['illustrator'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
+    photoshop = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
+    status['apps']['photoshop'] = {
+        'installed': photoshop
+        'name': 'Adobe Photoshop'
+    }
+    indesign = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
+    status['apps']['indesign'] = {
+        'installed': indesign
+        'name': 'Adobe InDesign'
+    }
+    premiere = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
+    status['apps']['premiere'] = {
+        'installed': premiere
+        'name': 'Adobe Premiere'
+    }
+    illustrator = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
+    status['apps']['illustrator'] = {
+        'installed': illustrator
+        'name': 'Illustrator'
+    }
 
-    status['apps']['videoproj'] = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
+    videoproj = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
+    status['apps']['videoproj'] = {
+        'installed': videoproj
+        'name': 'EPSON Vidéoprojecteur'
+    }
 
-    status['apps']['antivirus'] = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Sophos\Sophos Anti-Virus" echo ok', shell=True)
+    antivirus = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Sophos\Sophos Anti-Virus" echo ok', shell=True)
+    status['apps']['antivirus'] = {
+        'installed': office
+        'name': 'Sophos Antivirus'
+    }
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers
