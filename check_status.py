@@ -91,12 +91,16 @@ def main():
         status['shutdown'] = 'sactiv' not in ret
 
     status['apps'] = {}
-    apps = get_ret_str('wmic product get /format:csv')
+    apps = get_ret_str('wmic product get name /format:csv')
     status['apps']['office'] = 'office' in apps
-    status['apps']['photoshop'] = 'photoshop' in apps
-    status['apps']['indesign'] = 'indesign' in apps
-    status['apps']['premiere'] = 'premiere' in apps
-    status['apps']['illustrator'] = 'illustrator' in apps
+
+
+    status['apps']['vlc'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Video LAN" echo ok', shell=True)
+
+    status['apps']['photoshop'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
+    status['apps']['indesign'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
+    status['apps']['premiere'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
+    status['apps']['illustrator'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers
