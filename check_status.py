@@ -91,9 +91,8 @@ def main():
         status['shutdown'] = 'sactiv' not in ret
 
     status['apps'] = {}
-    apps = get_ret_str('wmic product get name /format:csv')
-    status['apps']['office'] = 'office' in apps
-
+    
+    status['apps']['office'] = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
 
     status['apps']['vlc'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Video LAN" echo ok', shell=True)
 
@@ -101,6 +100,7 @@ def main():
     status['apps']['indesign'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
     status['apps']['premiere'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
     status['apps']['illustrator'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
+
     status['apps']['videoproj'] = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
