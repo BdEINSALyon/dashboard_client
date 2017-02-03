@@ -124,7 +124,7 @@ def main():
     illustrator = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
     status['apps']['illustrator'] = {
         'installed': illustrator,
-        'name': 'Illustrator'
+        'name': 'Adobe Illustrator'
     }
 
     videoproj = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
