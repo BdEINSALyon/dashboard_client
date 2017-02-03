@@ -126,16 +126,34 @@ def main():
 
     status['name'] = os.environ.get('COMPUTERNAME')
 
+    config = subprocess.check_output("net config server").decode('raw_unicode_escape').split('  ')
+    comment = get_comment(config)
+
+    comment = comment.strip()
+    index = comment.index('\r')
+    comment = comment[:index]
+
+    status['description'] = comment
+
     # print(status)
     urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
+
+def get_comment(s):
+    for i, val in enumerate(s):
+	val = val.strip()
+	if len(val) > 0 and i > 1:
+		if not met_name:
+			met_name = True
+		else:
+			return val
 
 def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
 
 
 def get_ret_str(cmd, *args, **kwargs):
-    return str(get_ret(cmd, *args, **kwargs)).lower()
+    return get_ret(cmd, *args, **kwargs).decode('raw_unicode_escape').lower()
 
 
 def get_ret_decode(cmd, *args, **kwargs):
