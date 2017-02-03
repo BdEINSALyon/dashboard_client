@@ -130,8 +130,11 @@ def main():
     comment = get_comment(config)
 
     comment = comment.strip()
-    index = comment.index('\r')
-    comment = comment[:index]
+    try:
+        index = comment.index('\r')
+        comment = comment[:index]
+    except ValueError:
+        comment = ''
 
     status['description'] = comment
 
