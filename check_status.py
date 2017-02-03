@@ -55,7 +55,7 @@ def update():
 
     r = requests.get(url)
 
-    with open(UPDATE_FILE, 'w') as f:
+    with open(UPDATE_FILE, 'w', encoding='utf-8') as f:
         print(r.text, file=f)
 
     with open(UPDATE_FILE, 'rb') as f1:
