@@ -103,6 +103,8 @@ def main():
 
     status['apps']['videoproj'] = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
 
+    status['apps']['antivirus'] = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Sophos\Sophos Anti-Virus" echo ok', shell=True)
+
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers
 
