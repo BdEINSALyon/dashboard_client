@@ -142,11 +142,11 @@ def main():
 def get_comment(s):
     for i, val in enumerate(s):
         val = val.strip()
-    	if len(val) > 0 and i > 1:
-    		if not met_name:
-    			met_name = True
-    		else:
-    			return val
+        if len(val) > 0 and i > 1:
+            if not met_name:
+                met_name = True
+            else:
+                return val
 
 def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
