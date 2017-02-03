@@ -91,10 +91,10 @@ def main():
         status['shutdown'] = 'sactiv' not in ret
 
     status['apps'] = {}
-    
+
     status['apps']['office'] = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
 
-    status['apps']['vlc'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Video LAN" echo ok', shell=True)
+    status['apps']['vlc'] = 'ok' in get_ret_decode('if exist "c:\Program Files\VideoLAN" echo ok', shell=True)
 
     status['apps']['photoshop'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
     status['apps']['indesign'] = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
