@@ -94,46 +94,46 @@ def main():
 
     office = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
     status['apps']['office'] = {
-        'installed': office
+        'installed': office,
         'name': 'Microsoft Office'
     }
 
     vlc = 'ok' in get_ret_decode('if exist "c:\Program Files\VideoLAN" echo ok', shell=True)
     status['apps']['vlc'] = {
-        'installed': vlc
+        'installed': vlc,
         'name': 'VLC'
     }
 
     photoshop = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
     status['apps']['photoshop'] = {
-        'installed': photoshop
+        'installed': photoshop,
         'name': 'Adobe Photoshop'
     }
     indesign = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
     status['apps']['indesign'] = {
-        'installed': indesign
+        'installed': indesign,
         'name': 'Adobe InDesign'
     }
     premiere = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
     status['apps']['premiere'] = {
-        'installed': premiere
+        'installed': premiere,
         'name': 'Adobe Premiere'
     }
     illustrator = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
     status['apps']['illustrator'] = {
-        'installed': illustrator
+        'installed': illustrator,
         'name': 'Illustrator'
     }
 
     videoproj = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
     status['apps']['videoproj'] = {
-        'installed': videoproj
+        'installed': videoproj,
         'name': 'EPSON Vidéoprojecteur'
     }
 
     antivirus = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Sophos\Sophos Anti-Virus" echo ok', shell=True)
     status['apps']['antivirus'] = {
-        'installed': office
+        'installed': antivirus,
         'name': 'Sophos Antivirus'
     }
 
