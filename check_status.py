@@ -140,6 +140,7 @@ def main():
 
 
 def get_comment(s):
+    met_name = False
     for i, val in enumerate(s):
         val = val.strip()
         if len(val) > 0 and i > 1:
