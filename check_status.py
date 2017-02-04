@@ -83,7 +83,7 @@ def update():
 
 
 def main():
-    update()
+    #update()
     status = {}
     try:
         ret = get_ret_str('schtasks /query /tn "Shutdown"')
@@ -97,46 +97,54 @@ def main():
     office = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
     status['apps']['office'] = {
         'installed': office,
-        'name': 'Microsoft Office'
+        'name': 'Microsoft Office',
+        'mandatory': True
     }
 
     vlc = 'ok' in get_ret_decode('if exist "c:\Program Files\VideoLAN" echo ok', shell=True)
     status['apps']['vlc'] = {
         'installed': vlc,
-        'name': 'VLC'
+        'name': 'VLC',
+        'mandatory': False
     }
 
     photoshop = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
     status['apps']['photoshop'] = {
         'installed': photoshop,
-        'name': 'Adobe Photoshop'
+        'name': 'Adobe Photoshop',
+        'mandatory': False
     }
     indesign = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
     status['apps']['indesign'] = {
         'installed': indesign,
-        'name': 'Adobe InDesign'
+        'name': 'Adobe InDesign',
+        'mandatory': False
     }
     premiere = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
     status['apps']['premiere'] = {
         'installed': premiere,
-        'name': 'Adobe Premiere'
+        'name': 'Adobe Premiere',
+        'mandatory': False
     }
     illustrator = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
     status['apps']['illustrator'] = {
         'installed': illustrator,
-        'name': 'Adobe Illustrator'
+        'name': 'Adobe Illustrator',
+        'mandatory': False
     }
 
     videoproj = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
     status['apps']['videoproj'] = {
         'installed': videoproj,
-        'name': 'EPSON Vidéoprojecteur'
+        'name': 'EPSON Vidéoprojecteur',
+        'mandatory': False
     }
 
     antivirus = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Sophos\Sophos Anti-Virus" echo ok', shell=True)
     status['apps']['antivirus'] = {
         'installed': antivirus,
-        'name': 'Sophos Antivirus'
+        'name': 'Sophos Antivirus',
+        'mandatory': True
     }
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
