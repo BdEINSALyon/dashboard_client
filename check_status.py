@@ -148,7 +148,7 @@ def main():
     }
 
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
-    status['imprimante_ma'] = 'imprimante ma' in printers
+    status['imprimante_ma'] = 'imprimante ma' in printers or 'imprimante accueil' in printers
 
     status['os'] = {}
     status['os']['ram'] = {}
