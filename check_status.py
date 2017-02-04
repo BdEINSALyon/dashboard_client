@@ -180,6 +180,8 @@ def main():
 
     status['description'] = comment
 
+    status['windows_activation'] = 'avec licence' in get_ret_str('cscript //nologo "%systemroot%\system32\slmgr.vbs" /dli', shell=True)
+
     # print(status)
     urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
@@ -199,7 +201,6 @@ def is_installed(path):
 
 def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
-
 
 def get_ret_str(cmd, *args, **kwargs):
     return get_ret(cmd, *args, **kwargs).decode('raw_unicode_escape').lower()
