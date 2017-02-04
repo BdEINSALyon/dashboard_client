@@ -90,7 +90,7 @@ def main():
     except subprocess.CalledProcessError:
         status['shutdown'] = False
     else:
-        status['shutdown'] = 'sactiv' not in ret
+        status['shutdown'] = 'désactivé' not in ret
 
     status['apps'] = {}
 
@@ -161,14 +161,14 @@ def main():
     status['os']['ram']['available'] = int(available_ram)
 
     status['os']['disk'] = {}
-    disk_space = get_ret_decode('fsutil volume diskfree c:')
+    disk_space = get_ret_str('fsutil volume diskfree c:')
     sizes = [int(s) for s in disk_space.split() if s.isdigit()]
     status['os']['disk']['total'] = sizes[1]
     status['os']['disk']['available'] = sizes[2]
 
     status['name'] = os.environ.get('COMPUTERNAME')
 
-    config = subprocess.check_output("net config server").decode('raw_unicode_escape').split('  ')
+    config = subprocess.check_output("net config server").decode('cp850').split('  ')
     comment = get_comment(config)
 
     comment = comment.strip()
@@ -203,7 +203,7 @@ def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
 
 def get_ret_str(cmd, *args, **kwargs):
-    return get_ret(cmd, *args, **kwargs).decode('raw_unicode_escape').lower()
+    return get_ret(cmd, *args, **kwargs).decode('cp850').lower()
 
 
 def get_ret_decode(cmd, *args, **kwargs):
