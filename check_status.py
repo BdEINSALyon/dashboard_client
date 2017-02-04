@@ -83,7 +83,7 @@ def update():
 
 
 def main():
-    #update()
+    update()
     status = {}
     try:
         ret = get_ret_str('schtasks /query /tn "Shutdown"')
@@ -94,53 +94,53 @@ def main():
 
     status['apps'] = {}
 
-    office = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE" echo ok', shell=True)
+    office = is_installed('C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE') or is_installed('C:\Program Files\Microsoft Office\Office16\WINWORD.EXE')
     status['apps']['office'] = {
         'installed': office,
         'name': 'Microsoft Office',
         'mandatory': True
     }
 
-    vlc = 'ok' in get_ret_decode('if exist "c:\Program Files\VideoLAN" echo ok', shell=True)
+    vlc = is_installed('c:\Program Files\VideoLAN')
     status['apps']['vlc'] = {
         'installed': vlc,
         'name': 'VLC',
         'mandatory': False
     }
 
-    photoshop = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Photoshop CC 2017" echo ok', shell=True)
+    photoshop = is_installed('c:\Program Files\Adobe\Adobe Photoshop CC 2017')
     status['apps']['photoshop'] = {
         'installed': photoshop,
         'name': 'Adobe Photoshop',
         'mandatory': False
     }
-    indesign = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe InDesign CC 2017" echo ok', shell=True)
+    indesign = is_installed('c:\Program Files\Adobe\Adobe InDesign CC 2017')
     status['apps']['indesign'] = {
         'installed': indesign,
         'name': 'Adobe InDesign',
         'mandatory': False
     }
-    premiere = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Premiere Pro CC 2017" echo ok', shell=True)
+    premiere = is_installed('c:\Program Files\Adobe\Adobe Premiere Pro CC 2017')
     status['apps']['premiere'] = {
         'installed': premiere,
         'name': 'Adobe Premiere',
         'mandatory': False
     }
-    illustrator = 'ok' in get_ret_decode('if exist "c:\Program Files\Adobe\Adobe Illustrator CC 2017" echo ok', shell=True)
+    illustrator = is_installed('c:\Program Files\Adobe\Adobe Illustrator CC 2017')
     status['apps']['illustrator'] = {
         'installed': illustrator,
         'name': 'Adobe Illustrator',
         'mandatory': False
     }
 
-    videoproj = 'ok' in get_ret_decode('if exist "c:\Program Files (x86)\EPSON Projector" echo ok', shell=True)
+    videoproj = is_installed('c:\Program Files (x86)\EPSON Projector')
     status['apps']['videoproj'] = {
         'installed': videoproj,
         'name': 'EPSON Vidéoprojecteur',
         'mandatory': False
     }
 
-    antivirus = 'ok' in get_ret_decode('if exist "C:\Program Files (x86)\Sophos\Sophos Anti-Virus" echo ok', shell=True)
+    antivirus = is_installed('C:\Program Files (x86)\Sophos\Sophos Anti-Virus')
     status['apps']['antivirus'] = {
         'installed': antivirus,
         'name': 'Sophos Antivirus',
@@ -193,6 +193,9 @@ def get_comment(s):
                 met_name = True
             else:
                 return val
+
+def is_installed(path):
+    return 'ok' in get_ret_decode('if exist "{}" echo ok'.format(path), shell=True)
 
 def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
