@@ -136,7 +136,7 @@ def main():
     videoproj = is_installed('c:\Program Files (x86)\EPSON Projector')
     status['apps']['videoproj'] = {
         'installed': videoproj,
-        'name': 'EPSON Vidéoprojecteur',
+        'name': 'Vidéoprojecteur Salle IF',
         'mandatory': False
     }
 
