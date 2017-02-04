@@ -197,18 +197,13 @@ def get_comment(s):
                 return val
 
 def is_installed(path):
-    return 'ok' in get_ret_decode('if exist "{}" echo ok'.format(path), shell=True)
+    return 'ok' in get_ret_str('if exist "{}" echo ok'.format(path), shell=True)
 
 def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
 
 def get_ret_str(cmd, *args, **kwargs):
     return get_ret(cmd, *args, **kwargs).decode('cp850').lower()
-
-
-def get_ret_decode(cmd, *args, **kwargs):
-    return get_ret(cmd, *args, **kwargs).decode().lower()
-
 
 if __name__ == '__main__':
     main()
