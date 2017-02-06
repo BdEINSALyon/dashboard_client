@@ -85,6 +85,8 @@ def update():
 def main():
     update()
     status = {}
+
+    # Shutdown task
     try:
         ret = get_ret_str('schtasks /query /tn "Shutdown"')
     except subprocess.CalledProcessError:
@@ -92,6 +94,7 @@ def main():
     else:
         status['shutdown'] = 'désactivé' not in ret
 
+    # Apps
     status['apps'] = {}
 
     office32_path = 'C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE'
@@ -188,9 +191,11 @@ def main():
         }
     }
 
+    # MA Printer
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers or 'imprimante accueil' in printers
 
+    # RAM total and available
     status['os'] = {}
     status['os']['ram'] = {}
     total_ram = get_ret_str('wmic computersystem get TotalPhysicalMemory')
@@ -201,14 +206,24 @@ def main():
     available_ram = re.search('\d+', available_ram).group(0)
     status['os']['ram']['available'] = int(available_ram)
 
+    # Disk total and available
     status['os']['disk'] = {}
     disk_space = get_ret_str('fsutil volume diskfree c:')
     sizes = [int(s) for s in disk_space.split() if s.isdigit()]
     status['os']['disk']['total'] = sizes[1]
     status['os']['disk']['available'] = sizes[2]
 
+    # Locked sessions
+    args = ['C:\\Windows\\sysnative\\query.exe', 'user']
+    process = subprocess.Popen(args, stdout=subprocess.PIPE)
+    output, err = process.communicate()
+    usernames = [line[1:].split('  ')[0] for line in output.decode('cp850').split('\n')[1:] if 'Déco' in line]
+    status['os']['locked'] = usernames
+
+    # Computer name
     status['name'] = os.environ.get('COMPUTERNAME')
 
+    # Computer description
     config = subprocess.check_output("net config server").decode('cp850').split('  ')
     comment = get_comment(config)
 
@@ -221,6 +236,7 @@ def main():
 
     status['description'] = comment
 
+    # Is windows active ?
     status['windows_activation'] = 'avec licence' in get_ret_str('cscript //nologo "%systemroot%\system32\slmgr.vbs" /dli', shell=True)
 
     # print(status)
