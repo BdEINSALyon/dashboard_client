@@ -14,7 +14,7 @@ VERSION = 'v1.0.0'
 ALLOWED_COMMITTERS = {'PhilippeGeek', 'Crocmagnon'}
 
 # Referring server
-SERVER = 'http://status.bde-insa-lyon.fr'
+SERVER = 'https://status.bde-insa-lyon.fr'
 UPDATE_URL = SERVER + '/update'
 
 # GitHub API settings
