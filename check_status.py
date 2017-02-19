@@ -83,16 +83,31 @@ def update():
 
 
 def main():
-    update()
+    # update()
     status = {}
 
-    # Shutdown task
-    try:
-        ret = get_ret_str('schtasks /query /tn "Shutdown"')
-    except subprocess.CalledProcessError:
-        status['shutdown'] = False
-    else:
-        status['shutdown'] = 'désactivé' not in ret
+    status['tasks'] = {}
+
+    tasks = [
+        {'name': 'shutdown', 'tag': 'shutdown', 'display_name': 'Extinction automatique', 'mandatory': True},
+        {'name': 'delete user profiles', 'tag': 'delete_users', 'display_name': 'Suppression des utilisateurs', 'mandatory': False}
+    ]
+
+    for task in tasks:
+        try:
+            ret = get_ret_str('schtasks /query /tn "{0}"'.format(task['name']))
+            status['tasks'][task['tag']] = {
+                'name': task['display_name'],
+                'mandatory': task['mandatory'],
+                'verification': {
+                    'type': 'task',
+                    'task_name': task['name']
+                }
+            }
+        except subprocess.CalledProcessError:
+            status['tasks'][task['tag']]['installed'] = False
+        else:
+            status['tasks'][task['tag']]['installed'] = 'désactivé' not in ret
 
     # Apps
     status['apps'] = {}
@@ -239,7 +254,7 @@ def main():
     # Is windows active ?
     status['windows_activation'] = 'avec licence' in get_ret_str('cscript //nologo "%systemroot%\system32\slmgr.vbs" /dli', shell=True)
 
-    # print(status)
+    print(status)
     urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
 
