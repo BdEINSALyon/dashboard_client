@@ -101,7 +101,7 @@ def main():
                 'mandatory': task['mandatory'],
                 'verification': {
                     'type': 'task',
-                    'task_name': task['name']
+                    'task_names': [task['name']]
                 }
             }
         except subprocess.CalledProcessError:
