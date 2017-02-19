@@ -111,100 +111,30 @@ def main():
 
     # Apps
     status['apps'] = {}
+    apps = [
+        {'tag': 'office', 'display_name': 'Microsoft Office', 'mandatory': True, 'paths': ['C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE', 'C:\Program Files\Microsoft Office\Office16\WINWORD.EXE']},
+        {'tag': 'vlc', 'display_name': 'VLC', 'mandatory': False, 'paths': ['c:\Program Files\VideoLAN']},
+        {'tag': 'photoshop', 'display_name': 'Adobe Photoshop', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Photoshop CC 2017']},
+        {'tag': 'indesign', 'display_name': 'Adobe InDesign', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe InDesign CC 2017']},
+        {'tag': 'premiere', 'display_name': 'Adobe Premiere', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Premiere Pro CC 2017']},
+        {'tag': 'illustrator', 'display_name': 'Adobe Illustrator', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Illustrator CC 2017']},
+        {'tag': 'videoproj', 'display_name': 'Vidéoprojecteur Salle IF', 'mandatory': False, 'paths': ['c:\Program Files (x86)\EPSON Projector']},
+        {'tag': 'antivirus', 'display_name': 'Sophos Antivirus', 'mandatory': False, 'paths': ['C:\Program Files (x86)\Sophos\Sophos Anti-Virus']},
+    ]
 
-    office32_path = 'C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE'
-    office64_path = 'C:\Program Files\Microsoft Office\Office16\WINWORD.EXE'
-    office = is_installed(office32_path) or is_installed(office64_path)
-    status['apps']['office'] = {
-        'installed': office,
-        'name': 'Microsoft Office',
-        'mandatory': True,
-        'verification': {
-            'type': 'path',
-            'paths': [office32_path, office64_path]
+    for app in apps:
+        installed = False
+        for path in app['paths']:
+            installed = installed or is_installed(path)
+        status['apps'][app['tag']] = {
+            'name': app['display_name'],
+            'mandatory': app['mandatory'],
+            'installed': installed,
+            'verification': {
+                'type': 'path',
+                'paths': app['paths']
+            }
         }
-    }
-
-    vlc_path = 'c:\Program Files\VideoLAN'
-    vlc = is_installed(vlc_path)
-    status['apps']['vlc'] = {
-        'installed': vlc,
-        'name': 'VLC',
-        'mandatory': False,
-        'verification': {
-            'type': 'path',
-            'paths': [vlc_path]
-        }
-    }
-
-    photoshop_path = 'c:\Program Files\Adobe\Adobe Photoshop CC 2017'
-    photoshop = is_installed(photoshop_path)
-    status['apps']['photoshop'] = {
-        'installed': photoshop,
-        'name': 'Adobe Photoshop',
-        'mandatory': False,
-        'verification': {
-            'type': 'path',
-            'paths': [photoshop_path]
-        }
-    }
-    indesign_path = 'c:\Program Files\Adobe\Adobe InDesign CC 2017'
-    indesign = is_installed(indesign_path)
-    status['apps']['indesign'] = {
-        'installed': indesign,
-        'name': 'Adobe InDesign',
-        'mandatory': False,
-        'verification': {
-            'type': 'path',
-            'paths': [indesign_path]
-        }
-    }
-    premiere_path = 'c:\Program Files\Adobe\Adobe Premiere Pro CC 2017'
-    premiere = is_installed(premiere_path)
-    status['apps']['premiere'] = {
-        'installed': premiere,
-        'name': 'Adobe Premiere',
-        'mandatory': False,
-        'verification': {
-            'type': 'path',
-            'paths': [premiere_path]
-        }
-    }
-    illustrator_path = 'c:\Program Files\Adobe\Adobe Illustrator CC 2017'
-    illustrator = is_installed(illustrator_path)
-    status['apps']['illustrator'] = {
-        'installed': illustrator,
-        'name': 'Adobe Illustrator',
-        'mandatory': False,
-        'verification': {
-            'type': 'path',
-            'paths': [illustrator_path]
-        }
-    }
-
-    videoproj_path = 'c:\Program Files (x86)\EPSON Projector'
-    videoproj = is_installed(videoproj_path)
-    status['apps']['videoproj'] = {
-        'installed': videoproj,
-        'name': 'Vidéoprojecteur Salle IF',
-        'mandatory': False,
-        'verification': {
-            'type': 'path',
-            'paths': [videoproj_path]
-        }
-    }
-
-    antivirus_path = 'C:\Program Files (x86)\Sophos\Sophos Anti-Virus'
-    antivirus = is_installed(antivirus_path)
-    status['apps']['antivirus'] = {
-        'installed': antivirus,
-        'name': 'Sophos Antivirus',
-        'mandatory': True,
-        'verification': {
-            'type': 'path',
-            'paths': [antivirus_path]
-        }
-    }
 
     # MA Printer
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
