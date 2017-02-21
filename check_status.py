@@ -223,7 +223,7 @@ def main():
 
     # Temporary profiles
     users = get_ret_str('dir c:\\users', shell=True)
-    status['os']['temp_profiles'] = users.count('INSA-LYON')
+    status['os']['temp_profiles'] = users.count('.insa-lyon')
 
     # pprint.pprint(status)
     urlopen(UPDATE_URL, data=json.dumps(status).encode())
