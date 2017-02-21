@@ -221,6 +221,10 @@ def main():
             match = re_ip.search(info)
             status['network']['ip'] = match.group(1)
 
+    # Temporary profiles
+    users = get_ret_str('dir c:\\users', shell=True)
+    status['os']['temp_profiles'] = users.count('INSA-LYON')
+
     # pprint.pprint(status)
     urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
