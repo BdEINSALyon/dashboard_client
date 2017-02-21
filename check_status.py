@@ -106,7 +106,6 @@ def main():
             'names': [el['node']['value'] for el in task['verifValues']['edges']]
         })
 
-    pprint.pprint(tasks)
     # Check tasks
     status['tasks'] = {}
     for task in tasks:
@@ -210,7 +209,19 @@ def main():
     # Is windows active ?
     status['windows_activation'] = 'avec licence' in get_ret_str('cscript //nologo "%systemroot%\system32\slmgr.vbs" /dli', shell=True)
 
-    print(status)
+    # Network
+    status['network'] = {}
+
+    net = get_ret_str('netsh interface ip show config "Connexion au réseau local"').split('\r\n')
+    re_ip = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+    for info in net:
+        if 'dhcp activé' in info:
+            status['network']['dhcp'] = 'oui' in info
+        elif 'adresse ip' in info:
+            match = re_ip.search(info)
+            status['network']['ip'] = match.group(1)
+
+    # pprint.pprint(status)
     urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
 
