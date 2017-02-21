@@ -87,7 +87,7 @@ def update():
 def main():
     update()
     status = {}
-    default_query = """{ allVerifs(type_Name:"{0}") { edges { node { displayName tag mandatory verifValues{ edges { node { value } } } } } }}"""
+    default_query = """{ allVerifs(type_Name:"%s") { edges { node { displayName tag mandatory verifValues{ edges { node { value } } } } } }}"""
 
     # Fetch tasks
     tasks_query = default_query % ('Task')
@@ -110,20 +110,24 @@ def main():
     # Check tasks
     status['tasks'] = {}
     for task in tasks:
-        try:
-            ret = get_ret_str('schtasks /query /tn "{0}"'.format(task['name']))
-            status['tasks'][task['tag']] = {
-                'name': task['display_name'],
-                'mandatory': task['mandatory'],
-                'verification': {
-                    'type': 'task',
-                    'task_names': task['names']
-                }
-            }
-        except subprocess.CalledProcessError:
-            status['tasks'][task['tag']]['installed'] = False
-        else:
-            status['tasks'][task['tag']]['installed'] = 'désactivé' not in ret
+        installed = False
+        for name in task['names']:
+            try:
+                ret = get_ret_str('schtasks /query /tn "{0}"'.format(name))
+            except subprocess.CalledProcessError:
+                current = False
+            else:
+                current = 'désactivé' not in ret
+            installed = installed or current
+        status['tasks'][task['tag']] = {
+            'name': task['display_name'],
+            'mandatory': task['mandatory'],
+            'verification': {
+                'type': 'task',
+                'task_names': task['names']
+            },
+            'installed': installed
+        }
 
     # Fetch apps
     apps_query = default_query % ('App')
