@@ -119,7 +119,7 @@ def main():
         {'tag': 'premiere', 'display_name': 'Adobe Premiere', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Premiere Pro CC 2017']},
         {'tag': 'illustrator', 'display_name': 'Adobe Illustrator', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Illustrator CC 2017']},
         {'tag': 'videoproj', 'display_name': 'Vidéoprojecteur Salle IF', 'mandatory': False, 'paths': ['c:\Program Files (x86)\EPSON Projector']},
-        {'tag': 'antivirus', 'display_name': 'Sophos Antivirus', 'mandatory': False, 'paths': ['C:\Program Files (x86)\Sophos\Sophos Anti-Virus']},
+        {'tag': 'antivirus', 'display_name': 'Sophos Antivirus', 'mandatory': True, 'paths': ['C:\Program Files (x86)\Sophos\Sophos Anti-Virus']},
     ]
 
     for app in apps:
