@@ -8,6 +8,7 @@ from urllib.request import urlopen
 import json
 import requests
 import hashlib
+import pprint
 
 # To be modified variables
 VERSION = 'v1.0.0'
@@ -16,6 +17,7 @@ ALLOWED_COMMITTERS = {'PhilippeGeek', 'Crocmagnon'}
 # Referring server
 SERVER = 'https://status.bde-insa-lyon.fr'
 UPDATE_URL = SERVER + '/update'
+GRAPH_URL = SERVER + '/graphql'
 
 # GitHub API settings
 API_URL = 'https://api.github.com'
@@ -85,14 +87,28 @@ def update():
 def main():
     update()
     status = {}
+    default_query = """{ allVerifs(type_Name:"{0}") { edges { node { displayName tag mandatory verifValues{ edges { node { value } } } } } }}"""
 
+    # Fetch tasks
+    tasks_query = default_query % ('Task')
+
+    r = requests.get(GRAPH_URL + '?query=' + tasks_query)
+    fetched_tasks = r.json()
+
+    tasks = []
+
+    for task in fetched_tasks['data']['allVerifs']['edges']:
+        task = task['node']
+        tasks.append({
+            'tag': task['tag'],
+            'display_name': task['displayName'],
+            'mandatory': task['mandatory'],
+            'names': [el['node']['value'] for el in task['verifValues']['edges']]
+        })
+
+    pprint.pprint(tasks)
+    # Check tasks
     status['tasks'] = {}
-
-    tasks = [
-        {'name': 'shutdown', 'tag': 'shutdown', 'display_name': 'Extinction automatique', 'mandatory': True},
-        {'name': 'delete user profiles', 'tag': 'delete_users', 'display_name': 'Suppression des utilisateurs', 'mandatory': False}
-    ]
-
     for task in tasks:
         try:
             ret = get_ret_str('schtasks /query /tn "{0}"'.format(task['name']))
@@ -101,7 +117,7 @@ def main():
                 'mandatory': task['mandatory'],
                 'verification': {
                     'type': 'task',
-                    'task_names': [task['name']]
+                    'task_names': task['names']
                 }
             }
         except subprocess.CalledProcessError:
@@ -109,19 +125,25 @@ def main():
         else:
             status['tasks'][task['tag']]['installed'] = 'désactivé' not in ret
 
-    # Apps
-    status['apps'] = {}
-    apps = [
-        {'tag': 'office', 'display_name': 'Microsoft Office', 'mandatory': True, 'paths': ['C:\Program Files (x86)\Microsoft Office\Office16\WINWORD.EXE', 'C:\Program Files\Microsoft Office\Office16\WINWORD.EXE']},
-        {'tag': 'vlc', 'display_name': 'VLC', 'mandatory': False, 'paths': ['c:\Program Files\VideoLAN']},
-        {'tag': 'photoshop', 'display_name': 'Adobe Photoshop', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Photoshop CC 2017']},
-        {'tag': 'indesign', 'display_name': 'Adobe InDesign', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe InDesign CC 2017']},
-        {'tag': 'premiere', 'display_name': 'Adobe Premiere', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Premiere Pro CC 2017']},
-        {'tag': 'illustrator', 'display_name': 'Adobe Illustrator', 'mandatory': False, 'paths': ['c:\Program Files\Adobe\Adobe Illustrator CC 2017']},
-        {'tag': 'videoproj', 'display_name': 'Vidéoprojecteur Salle IF', 'mandatory': False, 'paths': ['c:\Program Files (x86)\EPSON Projector']},
-        {'tag': 'antivirus', 'display_name': 'Sophos Antivirus', 'mandatory': True, 'paths': ['C:\Program Files (x86)\Sophos\Sophos Anti-Virus']},
-    ]
+    # Fetch apps
+    apps_query = default_query % ('App')
 
+    r = requests.get(GRAPH_URL + '?query=' + apps_query)
+    fetched_apps = r.json()
+
+    apps = []
+
+    for app in fetched_apps['data']['allVerifs']['edges']:
+        app = app['node']
+        apps.append({
+            'tag': app['tag'],
+            'display_name': app['displayName'],
+            'mandatory': app['mandatory'],
+            'paths': [el['node']['value'] for el in app['verifValues']['edges']]
+        })
+
+    status['apps'] = {}
+    # Check apps
     for app in apps:
         installed = False
         for path in app['paths']:
