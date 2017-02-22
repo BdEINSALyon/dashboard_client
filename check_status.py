@@ -222,7 +222,8 @@ def main():
             status['network']['ip'] = match.group(1)
 
     # Temporary profiles
-    users = get_ret_str('dir c:\\users', shell=True)
+    home_drive = os.environ.get('HOMEDRIVE')
+    users = get_ret_str('dir {0}\\users'.format(home_drive), shell=True)
     status['os']['temp_profiles'] = users.count('.insa-lyon')
 
     # pprint.pprint(status)
