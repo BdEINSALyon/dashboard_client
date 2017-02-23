@@ -214,6 +214,8 @@ def main():
 
     for tag in ['', ' 2', ' 3', ' 4']:
         net_full = get_ret_str('netsh interface ip show config "Connexion au réseau local{0}"'.format(tag))
+        if 'adresse ip' not in net_full:
+            continue
         net = net_full.split('\r\n')
         re_ip = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
         for info in net:
