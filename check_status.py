@@ -212,14 +212,19 @@ def main():
     # Network
     status['network'] = {}
 
-    net = get_ret_str('netsh interface ip show config "Connexion au réseau local"').split('\r\n')
-    re_ip = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
-    for info in net:
-        if 'dhcp activé' in info:
-            status['network']['dhcp'] = 'oui' in info
-        elif 'adresse ip' in info:
-            match = re_ip.search(info)
-            status['network']['ip'] = match.group(1)
+    for tag in ['', ' 2', ' 3', ' 4']:
+        net_full = get_ret_str('netsh interface ip show config "Connexion au réseau local{0}"'.format(tag))
+        net = net_full.split('\r\n')
+        re_ip = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})')
+        for info in net:
+            if 'dhcp activé' in info:
+                status['network']['dhcp'] = 'oui' in info
+            elif 'adresse ip' in info:
+                match = re_ip.search(info)
+                status['network']['ip'] = match.group(1)
+
+        if '134.214' in net_full:
+            break
 
     # Temporary profiles
     home_drive = os.environ.get('HOMEDRIVE')
