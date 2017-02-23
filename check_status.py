@@ -30,9 +30,8 @@ HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
 SCRIPT_NAME = sys.argv[0]
 UPDATE_FILE = 'updated.py'
 
-def update():
-    r = requests.get(API_URL + '/rate_limit')
 
+def update():
     # Get latest commit and check if OK
     r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
     commit = r.json()[0]
@@ -86,106 +85,89 @@ def update():
 
 def main():
     update()
-    status = {}
-    default_query = """{ allVerifs(type_Name:"%s") { edges { node { displayName tag mandatory verifValues{ edges { node { value } } } } } }}"""
+    status = {
+        'os': {}
+    }
 
-    # Fetch tasks
-    tasks_query = default_query % ('Task')
+    check_category(status, 'App')
+    check_category(status, 'Task')
+    check_printer(status)
+    check_ram_usage(status)
+    check_disk_usage(status)
+    check_locked_sessions(status)
+    check_name(status)
+    check_description(status)
+    check_windows_activation(status)
+    check_network(status)
+    check_temp_profiles(status)
 
-    r = requests.get(GRAPH_URL + '?query=' + tasks_query)
-    fetched_tasks = r.json()
+    pprint.pprint(status)
+    urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
-    tasks = []
 
-    for task in fetched_tasks['data']['allVerifs']['edges']:
-        task = task['node']
-        tasks.append({
-            'tag': task['tag'],
-            'display_name': task['displayName'],
-            'mandatory': task['mandatory'],
-            'names': [el['node']['value'] for el in task['verifValues']['edges']]
-        })
-
-    # Check tasks
-    status['tasks'] = {}
-    for task in tasks:
-        installed = False
-        for name in task['names']:
-            try:
-                ret = get_ret_str('schtasks /query /tn "{0}"'.format(name))
-            except subprocess.CalledProcessError:
-                current = False
-            else:
-                current = 'désactivé' not in ret
-            installed = installed or current
-        status['tasks'][task['tag']] = {
-            'name': task['display_name'],
-            'mandatory': task['mandatory'],
-            'verification': {
-                'type': 'task',
-                'task_names': task['names']
-            },
-            'installed': installed
-        }
-
-    # Fetch apps
-    apps_query = default_query % ('App')
-
-    r = requests.get(GRAPH_URL + '?query=' + apps_query)
-    fetched_apps = r.json()
-
+def check_category(status, category):
+    fetched_checks = fetch_verifs(category)
     apps = []
 
-    for app in fetched_apps['data']['allVerifs']['edges']:
-        app = app['node']
+    for check in fetched_checks['data']['allVerifs']['edges']:
+        check = check['node']
         apps.append({
-            'tag': app['tag'],
-            'display_name': app['displayName'],
-            'mandatory': app['mandatory'],
-            'paths': [el['node']['value'] for el in app['verifValues']['edges']]
+            'tag': check['tag'],
+            'display_name': check['displayName'],
+            'mandatory': check['mandatory'],
+            'verifs': [el['node']['value'] for el in check['verifValues']['edges']]
         })
 
-    status['apps'] = {}
+    if category == 'App':
+        status_tag = 'apps'
+    elif category == 'Task':
+        status_tag = 'tasks'
+    else:
+        status_tag = 'none'
+
+    status[status_tag] = {}
+
     # Check apps
-    for app in apps:
+    for check in apps:
         installed = False
-        for path in app['paths']:
-            installed = installed or is_installed(path)
-        status['apps'][app['tag']] = {
-            'name': app['display_name'],
-            'mandatory': app['mandatory'],
-            'installed': installed,
-            'verification': {
+        for verif in check['verifs']:
+            installed = installed or is_installed(verif, category)
+
+        if category == 'App':
+            verif = {
                 'type': 'path',
-                'paths': app['paths']
+                'paths': check['verifs']
             }
+        elif category == 'Task':
+            verif = {
+                'type': 'task',
+                'task_names': check['verifs']
+            }
+        else:
+            verif = None
+
+        status[status_tag][check['tag']] = {
+            'name': check['display_name'],
+            'mandatory': check['mandatory'],
+            'installed': installed,
+            'verification': verif
         }
 
-    # MA Printer
+
+def fetch_verifs(category):
+    default_query = """{ allVerifs(type_Name:"%s") { edges { node { displayName tag mandatory verifValues{ edges { node { value } } } } } }}"""
+    apps_query = default_query % category
+
+    r = requests.get(GRAPH_URL + '?query=' + apps_query)
+    return r.json()
+
+
+def check_printer(status):
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers or 'imprimante accueil' in printers
 
-    check_ram_usage(status)
-
-    check_disk_usage(status)
-
-    check_locked_sessions(status)
-
-    check_name(status)
-
-    check_description(status)
-
-    check_windows_activation(status)
-
-    check_network(status)
-
-    check_temp_profiles(status)
-
-    # pprint.pprint(status)
-    urlopen(UPDATE_URL, data=json.dumps(status).encode())
 
 def check_ram_usage(status):
-    status['os'] = {}
     status['os']['ram'] = {}
     total_ram = get_ret_str('wmic computersystem get TotalPhysicalMemory')
     total_ram = re.search('\d+', total_ram).group(0)
@@ -195,12 +177,14 @@ def check_ram_usage(status):
     available_ram = re.search('\d+', available_ram).group(0)
     status['os']['ram']['available'] = int(available_ram)
 
+
 def check_disk_usage(status):
     status['os']['disk'] = {}
     disk_space = get_ret_str('fsutil volume diskfree c:')
     sizes = [int(s) for s in disk_space.split() if s.isdigit()]
     status['os']['disk']['total'] = sizes[1]
     status['os']['disk']['available'] = sizes[2]
+
 
 def check_locked_sessions(status):
     args = ['C:\\Windows\\sysnative\\query.exe', 'user']
@@ -209,11 +193,13 @@ def check_locked_sessions(status):
     usernames = [line[1:].split('  ')[0] for line in output.decode('cp850').split('\n')[1:] if 'Déco' in line]
     status['os']['locked'] = usernames
 
+
 def check_name(status):
     """
     Get computer name.
     """
     status['name'] = os.environ.get('COMPUTERNAME')
+
 
 def check_description(status):
     """
@@ -231,11 +217,14 @@ def check_description(status):
 
     status['description'] = comment
 
+
 def check_windows_activation(status):
     """
     Check whether Windows is activated.
     """
-    status['windows_activation'] = 'avec licence' in get_ret_str('cscript //nologo "%systemroot%\system32\slmgr.vbs" /dli', shell=True)
+    status['windows_activation'] = 'avec licence' in get_ret_str(
+        'cscript //nologo "%systemroot%\system32\slmgr.vbs" /dli', shell=True)
+
 
 def check_network(status):
     """
@@ -259,6 +248,7 @@ def check_network(status):
         if '134.214' in net_full:
             break
 
+
 def check_temp_profiles(status):
     home_drive = os.environ.get('HOMEDRIVE')
     if home_drive:
@@ -271,6 +261,7 @@ def check_temp_profiles(status):
     users = get_ret_str(query, shell=True)
     status['os']['temp_profiles'] = users.count('.insa-lyon')
 
+
 def get_comment(s):
     met_name = False
     for i, val in enumerate(s):
@@ -281,14 +272,27 @@ def get_comment(s):
             else:
                 return val
 
-def is_installed(path):
-    return 'ok' in get_ret_str('if exist "{}" echo ok'.format(path), shell=True)
+
+def is_installed(name, category):
+    if category == 'App':
+        return 'ok' in get_ret_str('if exist "{}" echo ok'.format(name), shell=True)
+
+    elif category == 'Task':
+        try:
+            ret = get_ret_str('schtasks /query /tn "{0}"'.format(name))
+        except subprocess.CalledProcessError:
+            return False
+        else:
+            return 'désactivé' not in ret
+
 
 def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
 
+
 def get_ret_str(cmd, *args, **kwargs):
     return get_ret(cmd, *args, **kwargs).decode('cp850').lower()
+
 
 if __name__ == '__main__':
     main()
