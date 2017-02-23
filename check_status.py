@@ -223,7 +223,14 @@ def main():
 
     # Temporary profiles
     home_drive = os.environ.get('HOMEDRIVE')
-    users = get_ret_str('dir {0}\\users'.format(home_drive), shell=True)
+    if home_drive:
+        query = 'dir {0}\\users'.format(home_drive)
+    else:
+        user_home = os.environ.get('USERPROFILE')
+        username = os.environ.get('USERNAME')
+        query = 'dir ' + re.sub(username + '$', '', user_home)
+
+    users = get_ret_str(query, shell=True)
     status['os']['temp_profiles'] = users.count('.insa-lyon')
 
     # pprint.pprint(status)
