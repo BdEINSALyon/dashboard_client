@@ -4,7 +4,6 @@ import os
 import sys
 import re
 import subprocess
-from urllib.request import urlopen
 import json
 import requests
 import hashlib
@@ -84,7 +83,7 @@ def update():
 
 
 def main():
-    update()
+    # update()
     status = {
         'os': {}
     }
@@ -101,8 +100,8 @@ def main():
     check_network(status)
     check_temp_profiles(status)
 
-    pprint.pprint(status)
-    urlopen(UPDATE_URL, data=json.dumps(status).encode())
+    # pprint.pprint(status)
+    requests.post(UPDATE_URL, data=json.dumps(status).encode())
 
 
 def check_category(status, category):
