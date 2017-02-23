@@ -83,7 +83,7 @@ def update():
 
 
 def main():
-    # update()
+    update()
     status = {
         'os': {}
     }
