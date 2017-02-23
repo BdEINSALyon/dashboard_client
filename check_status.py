@@ -189,7 +189,7 @@ def check_locked_sessions(status):
     args = ['C:\\Windows\\sysnative\\query.exe', 'user']
     process = subprocess.Popen(args, stdout=subprocess.PIPE)
     output, err = process.communicate()
-    usernames = [line[1:].split('  ')[0] for line in output.decode('cp850').split('\n')[1:] if 'Déco' in line]
+    usernames = [line[1:].split('  ')[0] for line in output.decode('cp850').split('\r\n')[1:] if 'Déco' in line]
     status['os']['locked'] = usernames
 
 
