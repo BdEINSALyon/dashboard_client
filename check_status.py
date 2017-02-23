@@ -186,9 +186,17 @@ def check_disk_usage(status):
 
 
 def check_locked_sessions(status):
+    """
+    Get the locked sessions
+    """
+
     args = ['C:\\Windows\\sysnative\\query.exe', 'user']
+
+    # For some reason, subprocess.check_output doesn't work with query.exe
     process = subprocess.Popen(args, stdout=subprocess.PIPE)
     output, err = process.communicate()
+
+    # Parse the output : for each line except the first, if "Déco" appears, get the username.
     usernames = [line[1:].split('  ')[0] for line in output.decode('cp850').split('\r\n')[1:] if 'Déco' in line]
     status['os']['locked'] = usernames
 
@@ -204,15 +212,16 @@ def check_description(status):
     """
     Get computer description.
     """
-    config = subprocess.check_output("net config server").decode('cp850').split('  ')
-    comment = get_comment(config)
+    config = subprocess.check_output("net config server").decode('cp850').split('\r\n')
 
-    comment = comment.strip()
-    try:
-        index = comment.index('\r')
-        comment = comment[:index]
-    except ValueError:
-        comment = ''
+    comment = ''
+    for line in config:
+        if 'commentaires' in line.lower():
+            re_desc = re.compile('^(?:\S+ )+(?: )+(\S+(?: \S+)+)$')
+            match = re_desc.search(line)
+            if match:
+                comment = match.group(1)
+            break
 
     status['description'] = comment
 
@@ -249,6 +258,9 @@ def check_network(status):
 
 
 def check_temp_profiles(status):
+    """
+    Count the number of temporary profiles opened.
+    """
     home_drive = os.environ.get('HOMEDRIVE')
     if home_drive:
         query = 'dir {0}\\users'.format(home_drive)
@@ -261,18 +273,10 @@ def check_temp_profiles(status):
     status['os']['temp_profiles'] = users.count('.insa-lyon')
 
 
-def get_comment(s):
-    met_name = False
-    for i, val in enumerate(s):
-        val = val.strip()
-        if len(val) > 0 and i > 1:
-            if not met_name:
-                met_name = True
-            else:
-                return val
-
-
 def is_installed(name, category):
+    """
+    Determines whether an app or a scheduled task is installed.
+    """
     if category == 'App':
         return 'ok' in get_ret_str('if exist "{}" echo ok'.format(name), shell=True)
 
