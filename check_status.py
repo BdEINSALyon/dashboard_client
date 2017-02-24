@@ -178,6 +178,11 @@ def check_ram_usage(status):
 
 
 def check_disk_usage(status):
+    """
+    Retrieve the
+    :param status:
+    :return:
+    """
     status['os']['disk'] = {}
     disk_space = get_ret_str('fsutil volume diskfree c:')
     sizes = [int(s) for s in disk_space.split() if s.isdigit()]
@@ -218,6 +223,9 @@ def check_description(status):
     for line in config:
         if 'commentaires' in line.lower():
             re_desc = re.compile('^(?:\S+ )+(?: )+(\S+(?: \S+)+)$')
+            # The line will be like "Commentaires du serveur         Description de l'ordinateur".
+            # The regex matches the last bits.
+            # \S matches any non-whitespace character.
             match = re_desc.search(line)
             if match:
                 comment = match.group(1)
