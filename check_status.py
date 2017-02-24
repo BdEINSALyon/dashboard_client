@@ -12,6 +12,7 @@ import pprint
 import requests
 
 # To be modified variables
+UPDATE = True
 VERSION = 'v1.0.0'
 ALLOWED_COMMITTERS = {'PhilippeGeek', 'Crocmagnon'}
 
@@ -30,6 +31,30 @@ HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
 
 SCRIPT_NAME = sys.argv[0]
 UPDATE_FILE = 'updated.py'
+
+
+def main():
+    if UPDATE:
+        update()
+
+    status = {
+        'os': {}
+    }
+
+    check_category(status, 'App')
+    check_category(status, 'Task')
+    check_printer(status)
+    check_ram_usage(status)
+    check_disk_usage(status)
+    check_locked_sessions(status)
+    check_name(status)
+    check_description(status)
+    check_windows_activation(status)
+    check_network(status)
+    check_temp_profiles(status)
+
+    # pprint.pprint(status)
+    requests.post(UPDATE_URL, data=json.dumps(status).encode())
 
 
 def update():
@@ -82,28 +107,6 @@ def update():
 
     else:
         os.remove(UPDATE_FILE)
-
-
-def main():
-    update()
-    status = {
-        'os': {}
-    }
-
-    check_category(status, 'App')
-    check_category(status, 'Task')
-    check_printer(status)
-    check_ram_usage(status)
-    check_disk_usage(status)
-    check_locked_sessions(status)
-    check_name(status)
-    check_description(status)
-    check_windows_activation(status)
-    check_network(status)
-    check_temp_profiles(status)
-
-    # pprint.pprint(status)
-    requests.post(UPDATE_URL, data=json.dumps(status).encode())
 
 
 def check_category(status, category):
