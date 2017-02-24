@@ -112,14 +112,15 @@ def update():
 
 def check_category(status, category):
     fetched_checks = fetch_verifs(category)
-    apps = []
+    checks = []
 
     for check in fetched_checks['data']['allVerifs']['edges']:
         check = check['node']
-        apps.append({
+        checks.append({
             'tag': check['tag'],
             'display_name': check['displayName'],
             'mandatory': check['mandatory'],
+            'icon': check['icon'],
             'verifs': [el['node']['value'] for el in check['verifValues']['edges']]
         })
 
@@ -133,7 +134,7 @@ def check_category(status, category):
     status[status_tag] = {}
 
     # Check apps
-    for check in apps:
+    for check in checks:
         installed = False
         for verif in check['verifs']:
             installed = installed or is_installed(verif, category)
@@ -154,13 +155,14 @@ def check_category(status, category):
         status[status_tag][check['tag']] = {
             'name': check['display_name'],
             'mandatory': check['mandatory'],
+            'icon': check['icon'],
             'installed': installed,
             'verification': verif
         }
 
 
 def fetch_verifs(category):
-    default_query = """{ allVerifs(type_Name:"%s") { edges { node { displayName tag mandatory verifValues{ edges { node { value } } } } } }}"""
+    default_query = """{ allVerifs(type_Name:"%s") { edges { node { displayName tag icon mandatory verifValues{ edges { node { value } } } } } }}"""
     apps_query = default_query % category
 
     r = requests.get(GRAPH_URL + '?query=' + apps_query)
