@@ -52,6 +52,7 @@ def main():
     check_windows_activation(status)
     check_network(status)
     check_temp_profiles(status)
+    check_install_date(status)
 
     # pprint.pprint(status)
     requests.post(UPDATE_URL, data=json.dumps(status).encode())
@@ -284,6 +285,30 @@ def check_temp_profiles(status):
 
     users = get_ret_str(query, shell=True)
     status['os']['temp_profiles'] = users.count('.insa-lyon')
+
+
+def check_install_date(status):
+    """
+    Get the system installation date.
+    """
+    info = get_ret_str('systeminfo').split('\r\n')
+    install = ''
+
+    for line in info:
+        if 'installation' in line:
+            install = line
+
+    re_date = re.compile(r'(\d{1,2})/(\d{2})/(\d{4}), (\d{1,2}):(\d{1,2}):(\d{1,2})$')
+    m = re_date.search(install)
+
+    status['os']['install_date'] = {
+        'day': int(m.group(1)),
+        'month': int(m.group(2)),
+        'year': int(m.group(3)),
+        'hour': int(m.group(4)),
+        'minute': int(m.group(5)),
+        'second': int(m.group(6))
+    }
 
 
 def is_installed(name, category):
