@@ -222,10 +222,10 @@ def check_description(status):
     comment = ''
     for line in config:
         if 'commentaires' in line.lower():
-            re_desc = re.compile('^(?:\S+ )+(?: )+(\S+(?: \S+)+)$')
             # The line will be like "Commentaires du serveur         Description de l'ordinateur".
             # The regex matches the last bits.
             # \S matches any non-whitespace character.
+            re_desc = re.compile('^(?:\S+ )+(?: )+(\S+(?: \S+)*)$')
             match = re_desc.search(line)
             if match:
                 comment = match.group(1)
