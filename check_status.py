@@ -1,13 +1,15 @@
 # coding: utf-8
 
+import datetime
+import hashlib
+import json
 import os
-import sys
 import re
 import subprocess
-import json
-import requests
-import hashlib
+import sys
 import pprint
+
+import requests
 
 # To be modified variables
 VERSION = 'v1.0.0'
