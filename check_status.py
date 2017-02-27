@@ -31,6 +31,8 @@ HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
 SCRIPT_NAME = sys.argv[0]
 UPDATE_FILE = 'updated.py'
 
+NAME = ''
+
 
 def main():
     if UPDATE:
@@ -40,13 +42,13 @@ def main():
         'os': {}
     }
 
+    check_name(status)  # Need to be first as other rely on it.
     check_category(status, 'App')
     check_category(status, 'Task')
     check_printer(status)
     check_ram_usage(status)
     check_disk_usage(status)
     check_locked_sessions(status)
-    check_name(status)
     check_description(status)
     check_windows_activation(status)
     check_network(status)
@@ -115,10 +117,18 @@ def check_category(status, category):
 
     for check in fetched_checks['data']['allVerifs']['edges']:
         check = check['node']
+
+        mandatory = check['mandatory']
+        if check['exceptionRules'] and len(check['exceptionRules']['edges']) > 0:
+            for exception in check['exceptionRules']['edges']:
+                exception = exception['node']['value']
+                if exception in NAME:
+                    mandatory = not mandatory
+
         checks.append({
             'tag': check['tag'],
             'display_name': check['displayName'],
-            'mandatory': check['mandatory'],
+            'mandatory': mandatory,
             'icon': check['icon'],
             'verifs': [el['node']['value'] for el in check['verifValues']['edges']]
         })
@@ -161,7 +171,22 @@ def check_category(status, category):
 
 
 def fetch_verifs(category):
-    default_query = """{ allVerifs(type_Name:"%s") { edges { node { displayName tag icon mandatory verifValues{ edges { node { value } } } } } }}"""
+    default_query = """
+    {
+        allVerifs(type_Name:"%s") {
+            edges {
+                node {
+                    displayName
+                    tag
+                    icon
+                    mandatory
+                    verifValues { edges { node { value } } }
+                    exceptionRules { edges { node { value } } }
+                }
+            }
+        }
+    }"""
+
     apps_query = default_query % category
 
     r = requests.get(GRAPH_URL + '?query=' + apps_query)
@@ -217,7 +242,9 @@ def check_name(status):
     """
     Get computer name.
     """
+    global NAME
     status['name'] = os.environ.get('COMPUTERNAME')
+    NAME = status['name']
 
 
 def check_description(status):
