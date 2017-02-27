@@ -124,6 +124,7 @@ def check_category(status, category):
                 exception = exception['node']['value']
                 if exception in NAME:
                     mandatory = not mandatory
+                    break
 
         checks.append({
             'tag': check['tag'],
