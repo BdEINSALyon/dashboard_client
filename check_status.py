@@ -48,7 +48,7 @@ def main():
     check_printer(status)
     check_ram_usage(status)
     check_disk_usage(status)
-    check_locked_sessions(status)
+    check_sessions(status)
     check_description(status)
     check_windows_activation(status)
     check_network(status)
@@ -223,7 +223,7 @@ def check_disk_usage(status):
     status['os']['disk']['available'] = sizes[2]
 
 
-def check_locked_sessions(status):
+def check_sessions(status):
     """
     Get the locked sessions
     """
@@ -235,8 +235,12 @@ def check_locked_sessions(status):
     output, err = process.communicate()
 
     # Parse the output : for each line except the first, if "Déco" appears, get the username.
-    usernames = [line[1:].split('  ')[0] for line in output.decode('cp850').split('\r\n')[1:] if 'Déco' in line]
+    sessions = output.decode('cp850').split('\r\n')
+    usernames = [line[1:].split('  ')[0] for line in sessions[1:] if 'Déco' in line]
     status['os']['locked'] = usernames
+
+    # Also check the total number of sessions : no header and line length not null
+    status['os']['total_sessions'] = len([session for session in sessions[1:] if len(session) > 0])
 
 
 def check_name(status):
