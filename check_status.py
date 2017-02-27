@@ -255,6 +255,8 @@ def check_network(status):
     """
     status['network'] = {}
 
+    name = ""
+
     for tag in ['', ' 2', ' 3', ' 4']:
         net_full = get_ret_str('netsh interface ip show config "Connexion au réseau local{0}"'.format(tag))
         if 'adresse ip' not in net_full:
@@ -269,7 +271,14 @@ def check_network(status):
                 status['network']['ip'] = match.group(1)
 
         if '134.214' in net_full:
+            name = 'Connexion au réseau local{0}'.format(tag)
             break
+
+    macs = get_ret_str('getmac /v /fo csv /nh').replace('"', '').split('\r\n')
+    for mac in macs:
+        if name.lower() in mac:
+            mac = mac.split(',')
+            status['network']['mac'] = mac[2]
 
 
 def check_temp_profiles(status):
