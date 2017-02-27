@@ -308,8 +308,8 @@ def check_network(status):
 
     macs = get_ret_str('getmac /v /fo csv /nh').replace('"', '').split('\r\n')
     for mac in macs:
-        if name.lower() in mac:
-            mac = mac.split(',')
+        mac = mac.split(',')
+        if len(mac) > 2 and name.lower() == mac[0]:
             status['network']['mac'] = mac[2].replace('-', ':')
 
 
