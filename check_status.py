@@ -305,7 +305,7 @@ def check_network(status):
     for mac in macs:
         if name.lower() in mac:
             mac = mac.split(',')
-            status['network']['mac'] = mac[2]
+            status['network']['mac'] = mac[2].replace('-', ':')
 
 
 def check_temp_profiles(status):
