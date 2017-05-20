@@ -45,6 +45,7 @@ def main():
     check_name(status)  # Need to be first as other rely on it.
     check_category(status, 'App')
     check_category(status, 'Task')
+    check_category(status, 'Registry')
     check_printer(status)
     check_ram_usage(status)
     check_disk_usage(status)
@@ -138,6 +139,8 @@ def check_category(status, category):
         status_tag = 'apps'
     elif category == 'Task':
         status_tag = 'tasks'
+    elif category == 'Registry':
+        status_tag = 'registry'
     else:
         status_tag = 'none'
 
@@ -158,6 +161,11 @@ def check_category(status, category):
             verif = {
                 'type': 'task',
                 'task_names': check['verifs']
+            }
+        elif category == 'Registry':
+            verif = {
+                'type': 'registry',
+                'keys': check['verifs']
             }
         else:
             verif = None
@@ -188,9 +196,9 @@ def fetch_verifs(category):
         }
     }"""
 
-    apps_query = default_query % category
+    category_query = default_query % category
 
-    r = requests.get(GRAPH_URL + '?query=' + apps_query)
+    r = requests.get(GRAPH_URL + '?query=' + category_query)
     return r.json()
 
 
@@ -367,6 +375,17 @@ def is_installed(name, category):
             return False
         else:
             return 'désactivé' not in ret
+
+    elif category == 'Registry':
+        name = name.split(' == ')
+        key = name[0]
+        expected_value = name[1]
+        try:
+            ret = get_ret_str('reg query {0}'.format(key)).replace('\r\n', '').split(' ')[-1]
+        except subprocess.CalledProcessError:
+            return False
+        else:
+            return ret == expected_value
 
 
 def get_ret(cmd, *args, **kwargs):
