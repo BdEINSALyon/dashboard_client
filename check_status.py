@@ -37,6 +37,7 @@ NAME = ''
 def main():
     if UPDATE:
         update()
+    # test comment
 
     status = {
         'os': {}
