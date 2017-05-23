@@ -42,7 +42,7 @@ def main():
         'os': {}
     }
 
-    check_name(status)  # Need to be first as other rely on it.
+    check_name(status)  # Needs to be first as other rely on it.
     check_category(status, 'App')
     check_category(status, 'Task')
     check_category(status, 'Registry')
@@ -55,7 +55,7 @@ def main():
     check_network(status)
     check_temp_profiles(status)
     check_install_date(status)
-    check_office_activation(status)
+    check_office_activation(status)  # Needs to be after check of apps.
 
     # pprint.pprint(status)
     requests.post(UPDATE_URL, data=json.dumps(status).encode())
