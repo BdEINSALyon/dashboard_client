@@ -55,6 +55,7 @@ def main():
     check_network(status)
     check_temp_profiles(status)
     check_install_date(status)
+    check_office_activation(status)
 
     # pprint.pprint(status)
     requests.post(UPDATE_URL, data=json.dumps(status).encode())
@@ -359,6 +360,14 @@ def check_install_date(status):
         'minute': int(m.group(5)),
         'second': int(m.group(6))
     }
+
+
+def check_office_activation(status):
+    res = get_ret_str('cscript "C:/Program Files (x86)/Microsoft Office/Office16/OSPP.VBS" /dstatus').split('-' * 39)
+    for r in res:
+        if 'office16proplus' in r or 'office16o365proplus' in r:
+            status['office_activation'] = '---licensed---' in r
+            return
 
 
 def is_installed(name, category):
