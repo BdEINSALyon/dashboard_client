@@ -86,6 +86,13 @@ def update():
 
     r = requests.get(url)
 
+    # If we don't get a successful request, don't update with the returned content.
+    if r.status_code not in [200, 301, 302]:
+        return
+
+    if r.text.startswith('<html><body><h1>503'):
+        return
+
     with open(UPDATE_FILE, 'w', encoding='utf-8') as f:
         print(r.text, file=f)
 
