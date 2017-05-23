@@ -388,7 +388,7 @@ def check_office_activation(status):
             return
 
     for r in res:
-        if 'office16proplus' in r or 'office16o365proplus' in r:
+        if 'office16proplus' in r or 'office16o365proplus' in r or 'office16standard' in r:
             status['office_activation'] = '---licensed---' in r
             return
 
