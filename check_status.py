@@ -370,6 +370,14 @@ def check_install_date(status):
 
 
 def check_office_activation(status):
+    """
+    Check if office is activated. Doesn't check if office is not installed.
+    """
+
+    if not status.get('apps').get('office').get('installed'):
+        status['office_activation'] = None
+        return
+
     res = get_ret_str('cscript "C:/Program Files (x86)/Microsoft Office/Office16/OSPP.VBS" /dstatus').split('-' * 39)
     for r in res:
         if 'office16proplus' in r or 'office16o365proplus' in r:
