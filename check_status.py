@@ -378,7 +378,15 @@ def check_office_activation(status):
         status['office_activation'] = None
         return
 
-    res = get_ret_str('cscript "C:/Program Files (x86)/Microsoft Office/Office16/OSPP.VBS" /dstatus').split('-' * 39)
+    try:
+        res = get_ret_str('cscript "C:/Program Files (x86)/Microsoft Office/Office16/OSPP.VBS" /dstatus').split('-' * 39)
+    except subprocess.CalledProcessError:
+        try:
+            res = get_ret_str('cscript "C:/Program Files/Microsoft Office/Office16/OSPP.VBS" /dstatus').split('-' * 39)
+        except subprocess.CalledProcessError:
+            status['office_activation'] = None
+            return
+
     for r in res:
         if 'office16proplus' in r or 'office16o365proplus' in r:
             status['office_activation'] = '---licensed---' in r
