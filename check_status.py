@@ -217,9 +217,12 @@ def check_printer(status):
 
 def check_ram_usage(status):
     status['os']['ram'] = {}
-    total_ram = get_ret_str('wmic computersystem get TotalPhysicalMemory')
-    total_ram = re.search('\d+', total_ram).group(0)
-    status['os']['ram']['total'] = int(int(total_ram) / 1024)
+    res = get_ret_str('powershell -command "Get-wmiobject -query \\"Select Capacity from CIM_PhysicalMemory\\"')
+    total_ram = 0
+    for line in res.split('\n'):
+        if 'capacity' in line:
+            total_ram += int(re.search('\d+', line).group(0))
+    status['os']['ram']['total'] = int(total_ram / 1024)
 
     available_ram = get_ret_str('wmic OS get FreePhysicalMemory')
     available_ram = re.search('\d+', available_ram).group(0)
