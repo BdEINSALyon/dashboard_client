@@ -58,7 +58,13 @@ def main():
     check_office_activation(status)  # Needs to be after check of apps.
 
     # pprint.pprint(status)
-    requests.post(UPDATE_URL, data=json.dumps(status).encode())
+    headers = None
+    token = os.getenv('DASHBOARD_TOKEN')
+    if token:
+        headers = {
+            'Authorization': 'token {}'.format(token)
+        }
+    requests.post(UPDATE_URL, data=json.dumps(status).encode(), headers=headers)
 
 
 def update():
