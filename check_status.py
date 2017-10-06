@@ -47,6 +47,7 @@ def main():
     check_category(status, 'Task')
     check_category(status, 'Registry')
     check_printer(status)
+    check_os_version(status)
     check_ram_usage(status)
     check_disk_usage(status)
     check_sessions(status)
@@ -219,6 +220,16 @@ def fetch_verifs(category):
 def check_printer(status):
     printers = get_ret_str('CScript C:/Windows/System32/Printing_Admin_Scripts/fr-FR/prnmngr.vbs -l')
     status['imprimante_ma'] = 'imprimante ma' in printers or 'imprimante accueil' in printers
+
+
+def check_os_version(status):
+    version = sys.getwindowsversion()
+    status['os']['version'] = {
+        'major': version.major,
+        'minor': version.minor,
+        'build': version.build,
+        'service_pack': version.service_pack
+    }
 
 
 def check_ram_usage(status):
