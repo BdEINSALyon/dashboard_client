@@ -28,7 +28,7 @@ COMMIT_PATH = '/commits'
 TAG_PATH = '/git/refs/tags/'
 HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
 
-SCRIPT_NAME = sys.argv[0]
+SCRIPT_NAME = os.path.basename(__file__)
 UPDATE_FILE = 'updated.py'
 
 NAME = ''
