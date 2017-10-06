@@ -315,7 +315,11 @@ def check_network(status):
     name = ""
 
     for tag in ['', ' 2', ' 3', ' 4']:
-        net_full = get_ret_str('netsh interface ip show config "Connexion au réseau local{0}"'.format(tag))
+        prefix = "Connexion au réseau local"
+        if sys.getwindowsversion().major == 10:
+            prefix = "Ethernet"
+
+        net_full = get_ret_str('netsh interface ip show config "{0}{1}"'.format(prefix, tag))
         if 'adresse ip' not in net_full:
             continue
         net = net_full.split('\r\n')
