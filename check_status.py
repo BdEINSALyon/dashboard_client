@@ -332,7 +332,7 @@ def check_network(status):
                 status['network']['ip'] = match.group(1)
 
         if '134.214' in net_full:
-            name = 'Connexion au réseau local{0}'.format(tag)
+            name = prefix + tag
             break
 
     macs = get_ret_str('getmac /v /fo csv /nh').replace('"', '').split('\r\n')
