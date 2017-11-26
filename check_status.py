@@ -39,12 +39,12 @@ DATETIME_LOCATION = 'timestamp.txt'
 
 
 def main():
-    if UPDATE:
-        update()
-
     status = {
         'os': {}
     }
+
+    if UPDATE:
+        update(status)
 
     check_name(status)  # Needs to be first as other rely on it.
     check_category(status, 'App')
@@ -72,17 +72,19 @@ def main():
     requests.post(UPDATE_URL, data=json.dumps(status).encode(), headers=headers)
 
 
-def update():
+def update(status):
     # Reduce update frequency
     last_run = None
     if os.path.isfile(DATETIME_LOCATION):
         with open(DATETIME_LOCATION, 'rb') as f:
             last_run = pickle.load(f)
+            status['last_update'] = last_run
 
     if last_run is not None and last_run + datetime.timedelta(minutes=50) > datetime.datetime.now():
         return
 
     last_run = datetime.datetime.now()
+    status['last_update'] = last_run
     with open(DATETIME_LOCATION, 'wb') as f:
         pickle.dump(last_run, f)
 
