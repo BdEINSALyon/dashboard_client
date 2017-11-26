@@ -95,8 +95,8 @@ def update(status):
     sha = commit.get('sha')
 
     data['last_run'] = datetime.datetime.now()
-    data['version'] = sha
-    status['version'] = sha
+    data['version'] = {'sha': sha, 'url': commit.get('html_url')}
+    status['version'] = data['version']
     with open(DATETIME_LOCATION, 'wb') as f:
         pickle.dump(data, f)
 
