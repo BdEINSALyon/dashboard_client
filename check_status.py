@@ -87,6 +87,7 @@ def update(status):
     r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
     json = r.json()
     if 'message' in json:
+        print(json)
         return
     commit = json[0]
     verified = commit.get('commit').get('verification').get('verified')
