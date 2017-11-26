@@ -71,7 +71,10 @@ def main():
 def update():
     # Get latest commit and check if OK
     r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
-    commit = r.json()[0]
+    json = r.json()
+    if 'message' in json:
+        return
+    commit = json[0]
     verified = commit.get('commit').get('verification').get('verified')
     author = commit.get('author').get('login')
     sha = commit.get('sha')
