@@ -1,5 +1,5 @@
 # coding: utf-8
-
+import datetime
 import hashlib
 import json
 import os
@@ -7,6 +7,8 @@ import re
 import subprocess
 import sys
 import pprint
+
+import pickle
 
 import requests
 
@@ -32,6 +34,8 @@ SCRIPT_NAME = os.path.basename(__file__)
 UPDATE_FILE = 'updated.py'
 
 NAME = ''
+
+DATETIME_LOCATION = 'timestamp.txt'
 
 
 def main():
@@ -69,6 +73,19 @@ def main():
 
 
 def update():
+    # Reduce update frequency
+    last_run = None
+    if os.path.isfile(DATETIME_LOCATION):
+        with open(DATETIME_LOCATION, 'rb') as f:
+            last_run = pickle.load(f)
+
+    if last_run is not None and last_run + datetime.timedelta(minutes=50) > datetime.datetime.now():
+        return
+
+    last_run = datetime.datetime.now()
+    with open(DATETIME_LOCATION, 'wb') as f:
+        pickle.dump(last_run, f)
+
     # Get latest commit and check if OK
     r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
     json = r.json()
