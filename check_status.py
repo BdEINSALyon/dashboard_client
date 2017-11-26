@@ -84,7 +84,7 @@ def update(status):
         return
 
     last_run = datetime.datetime.now()
-    status['last_fetch'] = last_run
+    status['version'] = last_run
     with open(DATETIME_LOCATION, 'wb') as f:
         pickle.dump(last_run, f)
 
