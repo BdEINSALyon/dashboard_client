@@ -74,19 +74,14 @@ def main():
 
 def update(status):
     # Reduce update frequency
-    last_run = None
+    data = {'last_run': None, 'version': None}
     if os.path.isfile(DATETIME_LOCATION):
         with open(DATETIME_LOCATION, 'rb') as f:
-            last_run = pickle.load(f)
-            status['last_update'] = last_run
+            data = pickle.load(f)
+            status['version'] = data['version']
 
-    if last_run is not None and last_run + datetime.timedelta(minutes=50) > datetime.datetime.now():
+    if data['last_run'] is not None and data['last_run'] + datetime.timedelta(minutes=50) > datetime.datetime.now():
         return
-
-    last_run = datetime.datetime.now()
-    status['version'] = last_run
-    with open(DATETIME_LOCATION, 'wb') as f:
-        pickle.dump(last_run, f)
 
     # Get latest commit and check if OK
     r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
@@ -97,6 +92,12 @@ def update(status):
     verified = commit.get('commit').get('verification').get('verified')
     author = commit.get('author').get('login')
     sha = commit.get('sha')
+
+    data['last_run'] = datetime.datetime.now()
+    data['version'] = sha
+    status['version'] = sha
+    with open(DATETIME_LOCATION, 'wb') as f:
+        pickle.dump(data, f)
 
     download_needed = verified and author in ALLOWED_COMMITTERS
 
