@@ -85,9 +85,9 @@ def update(status):
     # Get latest commit and check if OK
     r = requests.get(REPO_URL + COMMIT_PATH)
     json = r.json()
-    # if 'message' in json:
-    #     print(json)
-    #     return
+    if 'message' in json:
+        print(json)
+        return
     commit = json[0]
     verified = True
     author = commit.get('author_email')
