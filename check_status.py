@@ -24,7 +24,7 @@ GRAPH_URL = SERVER + '/graphql'
 
 # GitHub API settings
 API_URL = 'https://git.bde-insa-lyon.fr/api/v4'
-REPO_URL = API_URL + '/projects/BdEINSALyon%2Fdashboard_client'
+REPO_URL = API_URL + '/projects/BdEINSALyon%2Fstatus%2Fdashboard_client'
 COMMIT_PATH = '/repository/commits'
 
 WEB_COMMIT_URL = 'https://git.bde-insa-lyon.fr/BdEINSALyon/dashboard_client/commit/{}'
