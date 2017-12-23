@@ -15,7 +15,7 @@ import requests
 # To be modified variables
 UPDATE = True
 VERSION = 'v1.0.0'
-ALLOWED_COMMITTERS = {'PhilippeGeek', 'Crocmagnon'}
+ALLOWED_COMMITTERS = {'philippegeek@gmail.com', 'gabriel@augendre.info'}
 
 # Referring server
 SERVER = 'https://status.bde-insa-lyon.fr'
@@ -23,12 +23,11 @@ UPDATE_URL = SERVER + '/update'
 GRAPH_URL = SERVER + '/graphql'
 
 # GitHub API settings
-API_URL = 'https://api.github.com'
-REPO_URL = API_URL + '/repos/bdeinsalyon/dashboard_client'
-LATEST_RELEASE = '/releases/latest'
-COMMIT_PATH = '/commits'
-TAG_PATH = '/git/refs/tags/'
-HEADERS = {'Accept': 'application/vnd.github.cryptographer-preview+json'}
+API_URL = 'https://git.bde-insa-lyon.fr/api/v4'
+REPO_URL = API_URL + '/projects/BdEINSALyon%2Fdashboard_client'
+COMMIT_PATH = '/repository/commits'
+
+WEB_COMMIT_URL = 'https://git.bde-insa-lyon.fr/BdEINSALyon/dashboard_client/commit/{}'
 
 SCRIPT_NAME = os.path.basename(__file__)
 UPDATE_FILE = 'updated.py'
@@ -84,18 +83,18 @@ def update(status):
         return
 
     # Get latest commit and check if OK
-    r = requests.get(REPO_URL + COMMIT_PATH, headers=HEADERS)
+    r = requests.get(REPO_URL + COMMIT_PATH)
     json = r.json()
-    if 'message' in json:
-        print(json)
-        return
+    # if 'message' in json:
+    #     print(json)
+    #     return
     commit = json[0]
-    verified = commit.get('commit').get('verification').get('verified')
-    author = commit.get('author').get('login')
-    sha = commit.get('sha')
+    verified = True
+    author = commit.get('author_email')
+    sha = commit.get('id')
 
     data['last_run'] = datetime.datetime.now()
-    data['version'] = {'sha': sha, 'url': commit.get('html_url')}
+    data['version'] = {'sha': sha, 'url': WEB_COMMIT_URL.format(sha)}
     status['version'] = data['version']
     with open(DATETIME_LOCATION, 'wb') as f:
         pickle.dump(data, f)
@@ -105,12 +104,12 @@ def update(status):
     if not download_needed:
         return
 
-    r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha, headers=HEADERS)
-    files = r.json().get('files')
+    r = requests.get(REPO_URL + COMMIT_PATH + '/' + sha + '/diff')
+    files = r.json()
     url = None
     for f in files:
-        if f.get('filename') == SCRIPT_NAME:
-            url = f.get('raw_url')
+        if f.get('new_path') == SCRIPT_NAME:
+            url = 'https://git.bde-insa-lyon.fr/BdEINSALyon/status/dashboard_client/raw/' + sha + '/' + SCRIPT_NAME
 
     if url is None:
         return
