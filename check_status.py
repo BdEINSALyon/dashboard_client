@@ -170,6 +170,7 @@ def check_category(status, category):
             'display_name': check['displayName'],
             'mandatory': mandatory,
             'icon': check['icon'],
+            'icon_type': check['iconType'],
             'verifs': [el['node']['value'] for el in check['verifValues']['edges']]
         })
 
@@ -212,6 +213,7 @@ def check_category(status, category):
             'name': check['display_name'],
             'mandatory': check['mandatory'],
             'icon': check['icon'],
+            'icon_type': check['iconType'],
             'installed': installed,
             'verification': verif
         }
@@ -226,6 +228,7 @@ def fetch_verifs(category):
                     displayName
                     tag
                     icon
+                    iconType
                     mandatory
                     verifValues { edges { node { value } } }
                     exceptionRules { edges { node { value } } }
