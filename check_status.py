@@ -213,7 +213,7 @@ def check_category(status, category):
             'name': check['display_name'],
             'mandatory': check['mandatory'],
             'icon': check['icon'],
-            'icon_type': check['iconType'],
+            'icon_type': check['icon_type'],
             'installed': installed,
             'verification': verif
         }
