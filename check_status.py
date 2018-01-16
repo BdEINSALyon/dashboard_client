@@ -449,12 +449,12 @@ def is_installed(name, category):
     """
     name = name.split('\n')[0]
     if category == 'App':
-        if not re.compile(r'^[CD]:\\(Program Files( \(x86\))?|dashboard_client-master|Intel|Temp|Windows)[\\a-zA-Z1-9-_\. ]*$').match(name):
+        if not re.compile(r'^[CD]:\\(Program Files( \(x86\))?|dashboard_client-master|Intel|Temp|Windows)[\\a-zA-Z0-9-_\. ]*$').match(name):
             return False
         return 'ok' in get_ret_str('if exist "{}" echo ok'.format(name), shell=True)
 
     elif category == 'Task':
-        if not re.compile(r'^[a-zA-Z1-9-_ ]+$').match(name):
+        if not re.compile(r'^[a-zA-Z0-9-_ ]+$').match(name):
             return False
         try:
             ret = get_ret_str('schtasks /query /tn "{0}"'.format(name))
@@ -467,7 +467,7 @@ def is_installed(name, category):
         name = name.split(' == ')
         key = name[0]
         expected_value = name[1]
-        if not re.compile(r'^HKEY_[A-Z_]+[\\a-zA-Z1-9_-]*( -v [a-zA-Z1-9]+)?$').match(key):
+        if not re.compile(r'^HKEY_[A-Z_]+[\\a-zA-Z0-9_-]*( -v [a-zA-Z0-9]+)?$').match(key):
             return False
         try:
             ret = get_ret_str('reg query {0}'.format(key)).replace('\r\n', '').split(' ')[-1]
