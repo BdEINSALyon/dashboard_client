@@ -447,6 +447,7 @@ def is_installed(name, category):
     """
     Determines whether an app or a scheduled task is installed.
     """
+    name = name.split('\n')[0]
     if category == 'App':
         if not re.compile(r'^[CD]:\\(Program Files( \(x86\))?|dashboard_client-master|Intel|Temp|Windows)[\\a-zA-Z1-9-_\. ]*$').match(name):
             return False
