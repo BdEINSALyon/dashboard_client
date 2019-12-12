@@ -279,8 +279,13 @@ def check_disk_usage(status):
     :return:
     """
     status['os']['disk'] = {}
-    disk_space = get_ret_str('fsutil volume diskfree c:')
-    sizes = [int(s) for s in disk_space.split() if s.isdigit()]
+    import platform
+    if platform.release() == '10': #windows 10
+        disk_space = get_ret_str('fsutil volume diskfree c:', encoding='cp1252')
+        sizes = [int(s) for s in [s.replace('ÿ','') for s in sum([s.split(' ') for s in disk_space.split("\r")], [])] if s.isdigit()]
+    else:
+        disk_space = get_ret_str('fsutil volume diskfree c:')
+        sizes = [int(s) for s in disk_space.split() if s.isdigit()]
     status['os']['disk']['total'] = sizes[1]
     status['os']['disk']['available'] = sizes[2]
 
@@ -481,8 +486,8 @@ def get_ret(cmd, *args, **kwargs):
     return subprocess.check_output(cmd, *args, **kwargs)
 
 
-def get_ret_str(cmd, *args, **kwargs):
-    return get_ret(cmd, *args, **kwargs).decode('cp850').lower()
+def get_ret_str(cmd, encoding='cp850', *args, **kwargs):
+    return get_ret(cmd, *args, **kwargs).decode(encoding).lower()
 
 
 if __name__ == '__main__':
